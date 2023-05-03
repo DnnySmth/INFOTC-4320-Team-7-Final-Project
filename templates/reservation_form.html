@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Reserve a Seat</title>
+  </head>
+  <body>
+    <h1>Reserve a Seat</h1>
+    <form action="/reserve" method="POST">
+      <label for="first_name">First Name:</label>
+      <input type="text" name="first_name" required><br>
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" name="last_name" required><br>
+
+      <label for="seat_row">Seat Row:</label>
+      <input type="number" name="seat_row" min="1" max="12" required><br>
+
+      <label for="seat_col">Seat Column:</label>
+      <input type="number" name="seat_col" min="1" max="4" required><br>
+
+      <input type="submit" value="Reserve">
+    </form>
+    <a href="/">Back to Main Menu</a>
+  </body>
+</html>
