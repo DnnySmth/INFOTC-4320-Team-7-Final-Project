@@ -78,3 +78,6 @@ def admin_portal():
         return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
     else:
         return redirect(url_for('admin_login'))
+    
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
