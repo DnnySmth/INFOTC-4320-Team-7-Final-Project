@@ -70,6 +70,10 @@ def admin_login():
             return redirect(url_for('admin_portal'))
     return render_template('admin_login.html')
 
+@app.route('/reservation')
+def reservation():
+    return render_template('reservation_form.html')
+
 @app.route('/admin_portal')
 def admin_portal():
     if 'admin' in session and session['admin']:
@@ -78,6 +82,14 @@ def admin_portal():
         return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
     else:
         return redirect(url_for('admin_login'))
+    
+@app.route('/reserve', methods=['POST'])
+def reserve():
+    fname = request.form.get('first_name')
+    lname = request.form.get('last_name')
+    row = request.form.get('seat_row')
+    col = request.form.get('seat_col')
+    return render_template('output.html', formdata = {'fname': fname, 'lname': lname, 'row': row, 'col': col})
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5002')
