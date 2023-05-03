@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: DOCKERFILE
+    image: it4320-team7-finalfroject-image
+    container_name: it4320-team7-finalproject-container
+    ports:
+      - "5002:5002"
+    volumes:
+      - .:/app
+    environment:
+      FLASK_DEBUG: 1
