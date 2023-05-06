@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
-from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 app.debug = True
@@ -64,10 +63,7 @@ def authenticated(user, pwd):
     return any( cred[0] == user and cred[1] == pwd for cred in credentials )
 
 @app.route('/')
-def main_menu():
-    reservations = load_reservations()
-    app.logger.debug(is_seat_available(3,0,reservations))
-    
+def main_menu():  
     return render_template('main_menu.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -97,7 +93,6 @@ def reservation():
 def admin_portal():
     if session['admin']:
         reservations = load_reservations()
-        app.logger.debug(reservations)
         total_sales = calculate_total_sales(reservations)
         return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
     else:
