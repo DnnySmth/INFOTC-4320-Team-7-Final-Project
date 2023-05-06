@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
+from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
+app.debug = True
 app.secret_key = os.urandom(24)
+toolbar = DebugToolbarExtension(app)
 
 def get_cost_matrix():
     cost_matrix = [[100, 75, 50, 100] for row in range(12)]
@@ -37,18 +40,10 @@ def is_seat_available(row, col, reservations):
             return False
     return True
 
-def display_seating_chart(reservations):
-    cost_matrix = get_cost_matrix()
-    chart = '<table>'
-    for row in range(1, 13):
-        chart += '<tr>'
-        for col in range(1, 5):
-            if is_seat_available(row, col, reservations):
-                chart += f'<td><a href="/reserve?row={row}&col={col}">R{row}C{col}</a></td>'
-            else:
-                chart += f'<td>R{row}C{col}</td>'
-        chart += '</tr>'
-    chart += '</table>'
+def display_seating_chart():
+    cols = 4
+    rows = 12
+    chart = [[f'Row {row}, Seat {seat}' for seat in range(1, cols + 1)] for row in range(1, rows + 1)]
     return chart
 
 def generate_reservation_code():
@@ -62,6 +57,8 @@ def authenticated(user, pwd):
 @app.route('/')
 def main_menu():
     reservations = load_reservations()
+    app.logger.debug(get_cost_matrix())
+    
     return render_template('main_menu.html', chart=display_seating_chart(reservations))
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -91,7 +88,7 @@ def admin_portal():
     if session['admin']:
         reservations = load_reservations()
         total_sales = calculate_total_sales(reservations)
-        return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
+        return render_template('admin_portal.html', chart=display_seating_chart(), total_sales=total_sales)
     else:
         return redirect(url_for('admin'))
     
