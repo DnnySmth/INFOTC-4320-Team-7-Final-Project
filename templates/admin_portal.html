@@ -6,20 +6,7 @@
 <body>
 	<h1>Admin Portal</h1>
 	<p>Total Sales: ${{ total_sales }}</p>
-	<h2>Seating Chart</h2>
-	<table>
-		{% for row in chart %}
-			<tr>
-				{% for seat in row %}
-					{% if seat %}
-						<td style="background-color: #ff8080;">{{ seat }}</td>
-					{% else %}
-						{{ seat }}
-					{% endif %}
-				{% endfor %}
-			</tr>
-		{% endfor %}
-	</table>
+	{% include 'partials/seating_chart.html' %}
 	<a href="/">Back to Main Menu</a>
 </body>
 </html>

@@ -1,0 +1,14 @@
+<h2>Seating Chart</h2>
+<table>
+    {% for row in chart %}
+        <tr>
+            {% for seat_label in row %}
+            {% if 'Taken' in seat_label %}
+                <td style="background-color: red;">{{ seat_label.split(' (')[0] }}</td>
+            {% else %}
+                <td style="background-color: green;">{{ seat_label.split(' (')[0] }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
