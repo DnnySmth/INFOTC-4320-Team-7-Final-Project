@@ -28,8 +28,8 @@ def calculate_total_sales(reservations):
     cost_matrix = get_cost_matrix()
     total_sales = 0
     for reservation in reservations:
-        row = int(reservation[1]) - 1
-        col = int(reservation[2]) - 1
+        row = int(reservation[1])
+        col = int(reservation[2])
         price = cost_matrix[row][col]
         total_sales += price
     return total_sales
