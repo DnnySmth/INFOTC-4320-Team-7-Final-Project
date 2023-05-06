@@ -54,34 +54,43 @@ def display_seating_chart(reservations):
 def generate_reservation_code():
     return str(os.urandom(8).hex())
 
+def authenticated(user, pwd):
+    with open('data/passcodes.txt','r') as pwds:
+        credentials = [line.strip().split(', ') for line in pwds]
+    return any( cred[0] == user and cred[1] == pwd for cred in credentials )
+
 @app.route('/')
 def main_menu():
     reservations = load_reservations()
     return render_template('main_menu.html', chart=display_seating_chart(reservations))
 
 @app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    return render_template('admin_login.html')
+
+@app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and password == 'password':
+        if authenticated(username, password):
             session['admin'] = True
             reservations = load_reservations()
             return redirect(url_for('admin_portal'))
-    return render_template('admin_login.html')
-
+    
+    
 @app.route('/reservation')
 def reservation():
     return render_template('reservation_form.html')
 
 @app.route('/admin_portal')
 def admin_portal():
-    if 'admin' in session and session['admin']:
+    if session['admin']:
         reservations = load_reservations()
         total_sales = calculate_total_sales(reservations)
         return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
     else:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin'))
     
 @app.route('/reserve', methods=['POST'])
 def reserve():
