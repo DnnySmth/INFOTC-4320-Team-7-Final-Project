@@ -90,7 +90,8 @@ def admin_login():
     
 @app.route('/reservation')
 def reservation():
-    return render_template('reservation_form.html')
+    reservations = load_reservations()
+    return render_template('reservation_form.html', chart=display_seating_chart(reservations), total_sales=calculate_total_sales(reservations))
 
 @app.route('/admin_portal')
 def admin_portal():
