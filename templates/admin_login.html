@@ -5,6 +5,11 @@
 </head>
 <body>
 	<h1>Admin Login</h1>
+	{% with error = get_flashed_messages() %}
+    {% if error %}
+        <p style="color: red;">{{error[0]}}<p>
+    {% endif %}
+	{% endwith %}
 	<form method="POST" action="/admin/login">
 		<label>Username:</label>
 		<input type="text" name="username"><br><br>

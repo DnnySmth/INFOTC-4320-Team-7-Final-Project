@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
 
 app = Flask(__name__)
@@ -77,6 +77,9 @@ def admin_login():
             session['admin'] = True
             reservations = load_reservations()
             return redirect(url_for('admin_portal'))
+        else:
+            flash('Invalid username or password', 'error')
+            return redirect(url_for('admin'))
     
     
 @app.route('/reservation')
