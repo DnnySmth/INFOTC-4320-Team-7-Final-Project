@@ -81,9 +81,7 @@ def generate_reservation_code(name):
     return reservation_code
 
 @app.route('/')
-def main_menu():
-    app.logger.debug(generate_reservation_code("John"))
-    
+def main_menu():   
     return render_template('main_menu.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -107,7 +105,6 @@ def admin_login():
 def admin_portal():
     if session['admin']:
         reservations = load_reservations()
-        app.logger.debug(reservations)
         total_sales = calculate_total_sales(reservations)
         return render_template('admin_portal.html', chart=display_seating_chart(), total_sales=total_sales)
     else:
