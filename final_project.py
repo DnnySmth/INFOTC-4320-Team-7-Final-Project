@@ -63,10 +63,20 @@ def authenticated(user, pwd):
         credentials = [line.strip().split(', ') for line in pwds]
     return any( cred[0] == user and cred[1] == pwd for cred in credentials )
 
+def reservation_creation(name):
+    infotech = list("INFOTC4320")
+    reservation_code = ""
+    for i in range(max(len(name),len(infotech))):
+        if(i < len(name)):
+            reservation_code += name[i]
+        if(i < len(infotech)):
+            reservation_code += infotech[i]
+    return reservation_code
+
 @app.route('/')
 def main_menu():
     reservations = load_reservations()
-    app.logger.debug(is_seat_available(3,0,reservations))
+    app.logger.debug(reservation_creation("John"))
     
     return render_template('main_menu.html')
 
@@ -103,7 +113,7 @@ def admin_portal():
     else:
         return redirect(url_for('admin'))
     
-@app.route('/reserve', methods=['POST'])
+@app.route('/reserve', methods=['GET', 'POST'])
 def reserve():
     fname = request.form.get('first_name')
     lname = request.form.get('last_name')
