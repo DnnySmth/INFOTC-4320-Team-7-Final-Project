@@ -7,6 +7,11 @@
   </head>
   <body>
     <h1>Reserve a Seat</h1>
+    {% with error = get_flashed_messages() %}
+    {% if error %}
+      <p style="color: red;">{{error[0]}}<p>
+    {% endif %}
+    {% endwith %}
     <form action="/reserve" method="POST">
       <label for="first_name">First Name:</label>
       <input type="text" name="first_name" required><br>
