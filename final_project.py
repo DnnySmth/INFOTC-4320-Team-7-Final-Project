@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
-from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 app.debug = True
