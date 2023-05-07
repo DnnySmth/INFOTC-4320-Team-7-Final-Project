@@ -4,7 +4,6 @@ import os
 app = Flask(__name__)
 app.debug = True
 app.secret_key = os.urandom(24)
-toolbar = DebugToolbarExtension(app)
 
 def get_cost_matrix():
     cost_matrix = [[100, 75, 50, 100] for row in range(12)]
