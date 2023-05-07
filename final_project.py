@@ -21,8 +21,9 @@ def load_reservations():
     return reservations
 
 def save_reservation(reservation):
-    with open('reservations.txt', 'a') as file:
-        file.write(','.join(reservation) + '\n')
+    reservations = load_reservations()
+    with open('data/reservations.txt', 'a') as file:
+        file.write(', '.join(reservation) + '\n')
 
 def calculate_total_sales(reservations):
     cost_matrix = get_cost_matrix()
@@ -34,20 +35,29 @@ def calculate_total_sales(reservations):
         total_sales += price
     return total_sales
 
-def is_seat_available(row, col, reservations):
+def is_seat_available(row, col):
+    reservations = load_reservations()
     for reservation in reservations:
         res_name ,res_row, res_seat, res_id = reservation
         if int(res_row) == row and int(res_seat) == col:
             return False
     return True
 
-def display_seating_chart(reservations):
+def does_reservation_exist(code):
+    reservations = load_reservations()
+    for reservation in reservations:
+        res_name, res_row, res_seat, res_code = reservation
+        if code == res_code.strip():
+            return True
+    return False
+
+def display_seating_chart():
     chart = []
     for row in range(12):
         seat_row = []
         for seat in range(4):
             seat_label = f'Row {row + 1}, Seat {seat + 1}'
-            if is_seat_available(row, seat, reservations):
+            if is_seat_available(row, seat):
                 seat_label += ' (Open)'
             else:
                 seat_label += ' (Taken)'
@@ -55,15 +65,12 @@ def display_seating_chart(reservations):
         chart.append(seat_row)
     return chart
 
-def generate_reservation_code():
-    return str(os.urandom(8).hex())
-
 def authenticated(user, pwd):
     with open('data/passcodes.txt','r') as pwds:
         credentials = [line.strip().split(', ') for line in pwds]
     return any( cred[0] == user and cred[1] == pwd for cred in credentials )
 
-def reservation_creation(name):
+def generate_reservation_code(name):
     infotech = list("INFOTC4320")
     reservation_code = ""
     for i in range(max(len(name),len(infotech))):
@@ -75,8 +82,7 @@ def reservation_creation(name):
 
 @app.route('/')
 def main_menu():
-    reservations = load_reservations()
-    app.logger.debug(reservation_creation("John"))
+    app.logger.debug(generate_reservation_code("John"))
     
     return render_template('main_menu.html')
 
@@ -91,17 +97,11 @@ def admin_login():
         password = request.form['password']
         if authenticated(username, password):
             session['admin'] = True
-            reservations = load_reservations()
             return redirect(url_for('admin_portal'))
         else:
+            session['admin'] = False
             flash('Invalid username or password', 'error')
             return redirect(url_for('admin'))
-    
-    
-@app.route('/reservation')
-def reservation():
-    reservations = load_reservations()
-    return render_template('reservation_form.html', chart=display_seating_chart(reservations), total_sales=calculate_total_sales(reservations))
 
 @app.route('/admin_portal')
 def admin_portal():
@@ -109,17 +109,29 @@ def admin_portal():
         reservations = load_reservations()
         app.logger.debug(reservations)
         total_sales = calculate_total_sales(reservations)
-        return render_template('admin_portal.html', chart=display_seating_chart(reservations), total_sales=total_sales)
+        return render_template('admin_portal.html', chart=display_seating_chart(), total_sales=total_sales)
     else:
         return redirect(url_for('admin'))
+    
+@app.route('/reservation')
+def reservation():
+    reservations = load_reservations()
+    return render_template('reservation_form.html', chart=display_seating_chart())
     
 @app.route('/reserve', methods=['GET', 'POST'])
 def reserve():
     fname = request.form.get('first_name')
     lname = request.form.get('last_name')
-    row = request.form.get('seat_row')
-    col = request.form.get('seat_col')
-    return render_template('output.html', formdata = {'fname': fname, 'lname': lname, 'row': row, 'col': col})
+    row = int(request.form.get('seat_row'))
+    col = int(request.form.get('seat_col'))
+    res_code = generate_reservation_code(fname)
+    reservation = [fname, str(row-1), str(col-1), res_code]
+    if is_seat_available(row-1, col-1) and not does_reservation_exist(res_code):
+        save_reservation(reservation)
+        return render_template('reservation_created.html', resdata = {'fname': fname, 'lname': lname, 'row': row, 'col': col, 'res_code': res_code})
+    else:
+        flash(f'Reservation { res_code } already exists.', 'error')
+        return redirect(url_for('reservation'))
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5002')
